@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un Client{% endblock %}
+
+{% block body %}
+{# <div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h3>N. UTILISATEUR</h3>
+        </div>
+        <div class="card-body">
+            {{ form_start(form) }}
+            
+            <div class="mb-3">
+                {{ form_label(form.surname, 'Surname', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.surname, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.surname) }}
+            </div>
+            <div class="mb-3">
+                {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.nom) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.prenom) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.telephone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.telephone) }}
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(form.adresse, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.adresse) }}
+            </div>
+
+            <div class="form-check mb-3">
+                {{ form_widget(form.createAccount) }}
+                {{ form_label(form.createAccount, 'Créer un compte', {'label_attr': {'class': 'form-check-label'}}) }}
+            </div>
+
+            <div id="accountFields" style="display: none;">
+                <div class="mb-3">
+                    {{ form_label(form.login, 'Login', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.login, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.login) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.password, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.password) }}
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button type="button" class="btn btn-danger">Annuler</button>
+                {{ form_widget(form.save, {'attr': {'class': 'btn btn-primary'}}) }}
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div> #}
+<!-- Button to trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clientModal">
+    Nouvelle Client
+</button>
+
+<!-- Modal Structure -->
+<div class="modal fade" id="clientModal" tabindex="-1" aria-labelledby="clientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="clientModalLabel">Nouveau Client</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_label(form.surname, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.surname, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.surname) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.nom) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.prenom) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.telephone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.telephone) }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.adresse, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.adresse) }}
+                    </div>
+                    
+                    <div class="form-check form-switch">
+                        {{ form_widget(form.createAccount, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.createAccount, 'Créer un compte', {'label_attr': {'class': 'form-check-label'}}) }}
+                    </div>
+                    <div id="user-fields" style="display: none;">
+                        <div class="mb-3">
+                            {{ form_label(form.login, 'Login', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.login, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.login) }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(form.password, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.password) }}
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    {# function toggleAccountFields(checkbox) {
+        const accountFields = document.getElementById('accountFields');
+        accountFields.style.display = checkbox.checked ? 'block' : 'none';
+    } #}
+    document.addEventListener("DOMContentLoaded", () => {
+    const createAccountSwitch = document.querySelector('input[type="checkbox"][name="client[createAccount]"]');
+    const userFields = document.getElementById("user-fields");
+
+    createAccountSwitch.addEventListener("change", () => {
+        if (createAccountSwitch.checked) {
+            userFields.style.display = "block";
+        } else {
+            userFields.style.display = "none";
+        }
+    });
+});
+
+</script>
+
+{% endblock %}

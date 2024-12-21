@@ -4,26 +4,53 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: login
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            custom_authenticator: App\Security\LoginAuthenticator
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                target: app_login
+           
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
 
             # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            # switch_user: trues
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+     - { path: ^/client, roles: [ROLE_BOUTIQIER, ROLE_ADMIN] }
+     - { path: "^/client/{id}/dettes", roles: [ROLE_BOUTIQIER, ROLE_ADMIN] }
+     - { path: "^/client/mesdettes", roles: ROLE_CLIENT }
+     - { path: ^/dette, roles: [ROLE_BOUTIQIER, ROLE_ADMIN] }
+     - { path: ^/dette/non-soldes, roles: [ROLE_BOUTIQIER, ROLE_ADMIN] }
+     - { path: ^/dette/soldes, roles: [ROLE_BOUTIQIER, ROLE_ADMIN] }
+    #  - { path: "^/demande/{statut}", roles: ROLE_BOUTIQIER }
+    #  - { path: "^/demande/{id}/details", roles: ROLE_BOUTIQIER }
+    #  - { path: "^/payment/{idDette}", roles: ROLE_BOUTIQIER }
+     - { path: ^/dashboard, roles: [ROLE_BOUTIQIER, ROLE_ADMIN] }
+     - { path: ^/user, roles: ROLE_ADMIN }
+     - { path: ^/user/admins, roles: ROLE_ADMIN }
+     - { path: ^/user/boutiquiers, roles: ROLE_ADMIN }
+     - { path: ^/user/clients, roles: ROLE_ADMIN }
+    access_denied_url: /access-denied
+
+
+
+
 
 when@test:
     security:

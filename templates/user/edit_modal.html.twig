@@ -1,0 +1,31 @@
+<!-- user/edit_modal.html.twig -->
+<div class="modal fade" id="userEditModal" tabindex="-1" aria-labelledby="userEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userEditModalLabel">Modifier l'utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(form, { 'attr': { 'id': 'userEditForm' } }) }}
+                <div class="mb-3">
+                    {{ form_label(form.login, 'Login') }}
+                    {{ form_widget(form.login, { 'attr': { 'class': 'form-control' } }) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.nom, 'Nom') }}
+                    {{ form_widget(form.nom, { 'attr': { 'class': 'form-control' } }) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.prenom, 'Prénom') }}
+                    {{ form_widget(form.prenom, { 'attr': { 'class': 'form-control' } }) }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>

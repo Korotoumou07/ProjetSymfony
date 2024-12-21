@@ -1,0 +1,191 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ClientController!{% endblock %}
+
+{% block body %} 
+<body>
+    
+
+ 
+<style>
+.card-header{
+    background-color: #34495e;
+    color:white;
+}
+.btn{
+    background-color: #1abc9c;
+    border: 1px solid #1abc9c;
+
+}
+
+.container{
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+.user-info {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    justify-content: space-between;
+}
+
+.info-card {
+    display: flex;
+    height: 150px;
+    align-items: center;
+  
+}
+
+.icon-circle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #34495e; /* Bleu pour l'icône */
+    color: white;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    margin-right: 15px;
+    font-size: 24px;
+}
+
+.info-text h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.info-text p {
+    margin: 5px 0 0;
+    font-size: 20px;
+    font-weight:bold;
+    display: flex;
+    justify-content: center;
+    color: #1abc9c;
+}
+.fas{
+     color: #1abc9c;
+}
+
+
+   
+</style>
+
+
+<div class="maincontent">
+    <div class="user-debt-screen">
+      
+        <div class="user-info">
+    <div class="info-card">
+        <div class="icon-circle">
+            <i class="fas fa-wallet"></i>
+        </div>
+        <div class="info-text">
+            <h3>Total des Dettes</h3>
+            <p class="value">{{ totalDettes | number_format(0, '.', ' ') }} FCFA</p>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <div class="icon-circle">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="info-text">
+            <h3>Nombre de Clients</h3>
+            <p class="value">{{ totalClients }}</p>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <div class="icon-circle">
+            <i class="fas fa-boxes"></i>
+        </div>
+        <div class="info-text">
+            <h3>Articles en Stock</h3>
+            <p class="value">{{ totalArticles }}</p>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <div class="icon-circle">
+            <i class="fas fa-tasks"></i>
+        </div>
+        <div class="info-text">
+            <h3>Demandes en Cours</h3>
+            <p class="value">{{ demandesEnCours }}</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+  <!-- Contenu principal : tableaux -->
+  <div class="tables-container">
+   <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Articles en Rupture de Stock</h3>
+            </div>
+
+   
+       <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Article</th>
+            <th>Quantité Restante</th>
+            <th>Prix</th>
+          </tr>
+        </thead>
+        <tbody>
+           {% for article in articles %}
+                <tr>
+                    <td>{{ article.nomArticle }}</td>
+                    <td>{{ article.qteStock }} </td>
+                    <td>{{ article.prix }} FCFA</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3">Aucun article trouvé</td>
+                </tr>
+                {% endfor %} 
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+                
+                     
+
+                {# <!-- Pagination -->
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                        {% for i in 1..nbrePages %}
+                        <li class="page-item {% if page == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if page == nbrePages %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav> #}
+                <!-- End of Pagination -->
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+{% endblock %}

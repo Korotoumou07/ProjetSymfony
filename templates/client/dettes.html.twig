@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Dettes - {{ client.user ? client.user.nom ~ ' ' ~ client.user.prenom : client.surname }}{% endblock %}
+
+{% block body %}
+<style>
+.info-card {
+        display: flex;}
+
+    strong{
+        color:#16a085;
+    }
+</style>
+<div class="maincontent">
+    <div class="user-debt-screen">
+        <!-- User Information and Debt Summary -->
+        <div class="user-info">
+            <div class="info-card">
+                <div class="profile-picture">
+                    <img src="https://www.identite.photos/wp-content/uploads/2018/01/photo-identit%C3%A9-pr%C3%A9fectures-480x480.jpg" alt="Profile" />
+                </div>
+                <div class="details">
+                    <p><strong>Prénom:</strong> {{ client.user.prenom }}</p>
+                    <p><strong>Nom:</strong> {{ client.user.nom }}</p>
+                    <p><strong>Tel:</strong> {{ client.telephone }}</p>
+                    <p><strong>Email:</strong> {{ client.user.login }}</p>
+                </div>
+            </div>
+            <div class="debt-summary">
+                <p><strong>Montant Total:</strong> {{ totalMontant | number_format(0, '.', ' ') }} FCFA</p>
+                <p><strong>Montant Versé:</strong> {{ totalMontantVerser | number_format(0, '.', ' ') }} FCFA</p>
+                <p><strong>Montant Restant:</strong> {{ totalMontantRestant | number_format(0, '.', ' ') }} FCFA</p>
+            </div>
+        </div>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Montant</th>
+            <th>Montant Versé</th>
+            <th>Montant Restant</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for dette in dettes %}
+            <tr>
+                <td>{{ dette.dateAt|date('d-m-Y') }}</td>
+                <td>{{ dette.montant | number_format(0, '.', ' ') }} FCFA</td>
+                <td>{{ dette.montantVerser | number_format(0, '.', ' ') }} FCFA</td>
+                <td>{{ dette.montantRestant | number_format(0, '.', ' ') }} FCFA</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4" class="text-center">Aucune dette trouvée pour ce client.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                        {% for i in 1..nbrePages %}
+                        <li class="page-item {% if page == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if page == nbrePages %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+<a href="{{ path('app_client') }}" class="btn btn-secondary">Retour</a>
+{% endblock %}

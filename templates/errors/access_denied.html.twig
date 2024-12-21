@@ -1,0 +1,67 @@
+
+
+{% block title %}Accès refusé{% endblock %}
+
+{% block body %}
+<style>
+    .access-denied-page {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        color: white;
+    }
+
+    .error-box {
+        background-color: #34495e ;
+        color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        max-width: 500px;
+    }
+
+    .error-box h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        color: #1abc9c;
+    }
+
+    .error-box p {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .error-box hr {
+        border-top: 1px solid #1abc9c;
+        margin: 20px 0;
+    }
+
+    .error-box .btn {
+        background-color: #1abc9c;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+    .error-box .btn:hover {
+        background-color: #16a085;
+    }
+</style>
+
+<div class="access-denied-page">
+    <div class="error-box">
+        <h1>403</h1>
+        <h4 class="alert-heading">Accès refusé</h4>
+        <p>{{ message }}</p>
+        <hr>
+        <p>Si vous pensez que c'est une erreur, veuillez contacter l'administrateur.</p>
+        <a href="{{ path('app_dashboard') }}" class="btn">Retour au tableau de bord</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,298 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello PaymentController!{% endblock %}
+
+{% block body %}
+<style>
+   
+    
+
+    .tabs {
+        display: flex;
+        margin-bottom: 10px;
+    }
+
+    .tab-link {
+        padding: 10px 20px;
+        border: 1px solid #ddd;
+        background-color: white;
+        color: #16a085;
+        cursor: pointer;
+        margin-right: 5px;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .tab-link.active {
+        background-color: #16a085;
+        color: white;
+    }
+
+    .tab-content {
+        display: none;
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 0 0 5px 5px;
+        background-color: white;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .table thead {
+        background-color: #004aad;
+        color: white;
+    }
+
+    .table th, .table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
+    .search-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .search-bar input {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-right: 10px;
+    }
+
+    .search-bar button {
+        padding: 8px 15px;
+        background-color: #004aad;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 10px;
+    }
+
+    .pagination .btn {
+        margin: 0 5px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .pagination .btn-primary {
+        background-color: #004aad;
+        color: white;
+        border: none;
+    }
+
+    .pagination .btn-light {
+        background-color: #f1f1f1;
+        color: #004aad;
+        border: 1px solid #ddd;
+    }
+    .info-card {
+        display: flex;}
+
+    strong{
+        color:#16a085;
+    }
+    .btn-primary{
+    background-color: #1abc9c;
+    border: 1px solid #1abc9c;
+
+}
+    
+</style>
+
+</style>
+
+<div class="maincontent">
+    <div class="user-debt-screen">
+        <!-- User Information and Debt Summary -->
+        <div class="user-info">
+            <div class="info-card">
+                <div class="profile-picture">
+                    <img src="https://www.identite.photos/wp-content/uploads/2018/01/photo-identit%C3%A9-pr%C3%A9fectures-480x480.jpg" alt="Profile" />
+                </div>
+                <div class="details">
+                    <p><strong>Prénom:</strong> {{ dette.client.user.prenom }}</p>
+                    <p><strong>Nom:</strong> {{ dette.client.user.nom }}</p>
+                    <p><strong>Tel:</strong> {{ dette.client.telephone }}</p>
+                    <p><strong>Email:</strong> {{ dette.client.user.login }}</p>
+                </div>
+            </div>
+            <div class="debt-summary">
+                <p><strong>Montant Total:</strong> {{ dette.montant }} FCFA</p>
+                <p><strong>Montant Versé:</strong> {{ dette.montantVerser }} FCFA</p>
+                <p><strong>Montant Restant:</strong> {{ dette.montantRestant }} FCFA</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs-container">
+        {% set activeTab = app.request.query.get('tab', 'paiements') %}
+            <div class="tabs">
+                <button class="tab-link {{ activeTab == 'articles' ? 'active' }}" data-tab="articles">Articles</button>
+                <button class="tab-link {{ activeTab == 'paiements' ? 'active' }}" data-tab="paiements">Paiements</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div id="articles" class="tab-content {{ activeTab == 'articles' ? 'active' }}">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Article</th>
+                            <th>Prix</th>
+                            <th>Quantité</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+      {# {% for detail in details %}
+        <tr>
+            <td>{{ detail.article.name }}</td>
+            <td>{{ detail.qte }}</td>
+            <td>{{ detail.article.prix }}</td>
+            <td>{{ detail.article.prix * detail.qte }}</td>
+        </tr> #}
+                    {# {% for detail in articles %}
+                        <tr>
+                            <td>{{ detail.getArticle().nomArticle }}</td>
+                            <td>{{ detail..getArticle().prix }} FCFA</td>
+                            <td>{{ detail.qte }}</td>
+                            <td>{{ (detail.getArticle().prix * detail.qte) }} FCFA</td>
+
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3">Aucun article trouvé</td>
+                        </tr>
+                        {% endfor %}  #}
+
+                         {% for article in articles %}
+                        <tr>
+                            <td>{{ article.nomArticle }}</td>
+                            <td>{{ article.prix }} FCFA</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3">Aucun article trouvé</td>
+                        </tr>
+                        {% endfor %} 
+                        
+                    </tbody>
+                </table>
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if pageArticles == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?pageArticles={{ pageArticles - 1 }}&tab=articles" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                        {% for i in 1..nbrePagesArticles %}
+                        <li class="page-item {% if pageArticles == i %}active{% endif %}">
+                            <a class="page-link" href="?pageArticles={{ i }}&tab=articles">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if pageArticles == nbrePagesArticles %}disabled{% endif %}">
+                            <a class="page-link" href="?pageArticles={{ pageArticles + 1 }}&tab=articles" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+
+            </div>
+
+            <div id="paiements" class="tab-content {{ activeTab == 'paiements' ? 'active' }}">
+                <div class="search-bar">
+                    {{ form_start(form, {'attr': {'class': 'd-flex row gy-2 gx-3 align-items-center'}}) }}
+                    <div class="col-auto">
+                        {{ form_widget(form.montant, {'attr': {'class': 'form-control', 'placeholder': 'Montant','disabled':disabled }}) }}
+                    </div>
+                    <div class="col-auto">
+                        {{ form_widget(form.dateAt, {'attr': {'class': 'form-control', 'placeholder': 'Date','disabled':disabled }}) }}
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-primary" style="background-color: #1abc9c; border-color: #1abc9c;"{{ dette.montantRestant == 0 ? 'disabled' : '' }}>OK</button>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paiement in paiements %}
+                        <tr>
+                            <td>{{ paiement.dateAt|date('d-m-Y') }}</td>
+                            <td>{{ paiement.montant }} FCFA</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2">Aucun paiement trouvé</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if pagePaiements == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?pagePaiements={{ pagePaiements - 1 }}&tab=paiements" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                        {% for i in 1..nbrePagesPaiements %}
+                        <li class="page-item {% if pagePaiements == i %}active{% endif %}">
+                            <a class="page-link" href="?pagePaiements={{ i }}&tab=paiements">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if pagePaiements == nbrePagesPaiements %}disabled{% endif %}">
+                            <a class="page-link" href="?pagePaiements={{ pagePaiements + 1 }}&tab=paiements" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const tabs = document.querySelectorAll(".tab-link");
+    const contents = document.querySelectorAll(".tab-content");
+
+    tabs.forEach(tab => {
+        tab.addEventListener("click", function () {
+            tabs.forEach(t => t.classList.remove("active"));
+            contents.forEach(c => c.classList.remove("active"));
+            this.classList.add("active");
+            document.getElementById(this.dataset.tab).classList.add("active");
+            const url = new URL(window.location);
+            url.searchParams.set('tab', this.dataset.tab);
+            history.pushState({}, '', url);
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

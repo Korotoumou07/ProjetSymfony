@@ -1,0 +1,332 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello ClientController!{% endblock %}
+
+{% block body %} 
+<body>
+    
+
+ 
+<style>
+.card-header{
+    background-color: #34495e;
+    color:white;
+}
+.btn{
+    background-color: #1abc9c;
+    border: 1px solid #1abc9c;
+
+}
+.btn:hover{
+    background-color: #1abc9c;
+    border: 1px solid #1abc9c;
+
+}
+
+.container{
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+}
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+    background-color: #1abc9c;
+    color: white;
+}
+.modal-footer .btn-danger {
+    background-color: #e74c3c;
+    border: 1px solid #e74c3c;
+
+}
+.form-check-input:checked {
+        background-color: #1abc9c;
+        border-color: #1abc9c;
+    }
+
+    /* Optionnel : Ajuster la couleur au survol pour un effet plus esthétique */
+    .form-check-input:checked:hover {
+        background-color: #16a085;
+        border-color: #16a085;
+    }
+{# .modal-footer .btn-primary {
+    background-color: #3498db;
+} #}
+
+   
+</style>
+
+
+    <div class="maincontent">
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Lister Clients</h3>
+            </div>
+            <div class="card-body">
+               <!-- Search Form with "Nouvelle Client" Button -->
+                <div class="d-flex align-items-center mb-4 justify-content-between">
+                    <!-- Form Section -->
+                    <div class="d-flex align-items-center w-100">
+                        {{ form_start(searchClientform, {'attr': {'class': 'd-flex align-items-center w-100'}}) }}
+                        
+                        <!-- Telephone Input -->
+                        <div class="me-3 w-15">
+                            {{ form_row(searchClientform.telephone, {'attr': {'class': 'form-control', 'placeholder': 'Téléphone'}}) }}
+                        </div>
+                        
+                        <!-- Surname Input -->
+                        <div class="me-3 w-15">
+                            {{ form_row(searchClientform.surname, {'attr': {'class': 'form-control', 'placeholder': 'Nom de famille'}}) }}
+                        </div>
+                        
+                        <!-- Statut Input -->
+                        <div class="me-3 w-10">
+                            {{ form_row(searchClientform.statut, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div>
+                            <button type="submit" class="btn btn-primary">OK</button>
+                        </div>
+                        
+                        {{ form_end(searchClientform) }}
+                    </div>
+
+                    <!-- "Nouvelle Client" Button -->
+                    <div class="me-3 w-10">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#clientModal">
+                        Nouveau Client
+                    </button>
+                       
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <table class="table table-bordered">
+                    <thead class="table">
+                        <tr>
+                            <th>Prénom et Nom</th>
+                            <th>Téléphone</th>
+                            <th>Adresse</th>
+                            {# <th>Montant Dû</th> #}
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for client in clients %}
+                        <tr>
+                            <td>{{ client.user ? client.user.nom ~ " " ~ client.user.prenom : '-' }}</td>
+                            <td>{{ client.telephone }}</td>
+                            <td>{{ client.adresse }}</td>
+                            {# <td>{{ client.montantDue | number_format(0, '.', ',') }} FCFA</td> #}
+                             <td>
+                                {% if client.user %}
+                                    <a href="{{ path('app_clientdettes', { id: client.id }) }}" class="btn btn-primary btn-sm">Détails</a>
+                                {% else %}
+                                    <span class="text-muted">--</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun client trouvé</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <!-- End of Table -->
+
+                <!-- Pagination -->
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                        {% for i in 1..nbrePages %}
+                        <li class="page-item {% if page == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if page == nbrePages %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- End of Pagination -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="clientModal" tabindex="-1" aria-labelledby="clientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="clientModalLabel">Nouveau Client</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+    
+
+            <div class="modal-body">
+                {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_label(form.surname, 'Surname', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.surname, {'attr': {'class': 'form-control'}}) }}
+                        <div class="text-danger">  
+                            {{ form_errors(form.surname) }}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                        <div class="text-danger">  
+                            {{ form_errors(form.nom) }}
+                        </div>
+    
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.prenom, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                        {% if form.prenom.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(form.prenom) }}
+                            </div>
+                        {% endif %}                        
+                    </div>
+                    <div class="mb-3">
+                        {{ form_label(form.telephone, 'Téléphone', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
+                        {% if form.telephone.vars.errors|length > 0 %}
+                            <div class="text-danger">
+                                {{ form_errors(form.telephone) }}
+                            </div>
+                        {% endif %}  
+                        </div>
+                    <div class="mb-3">
+                        {{ form_label(form.adresse, 'Adresse', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.adresse, {'attr': {'class': 'form-control'}}) }}
+                        <div class="text-danger">  
+                            {{ form_errors(form.adresse) }}
+                        </div>
+                    </div>
+                    
+                    <div class="form-check form-switch">
+                        {{ form_widget(form.createAccount, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.createAccount, 'Créer un compte', {'label_attr': {'class': 'form-check-label'}}) }}
+                    </div>
+                    <div id="user-fields" style="display: none;">
+                        <div class="mb-3">
+                            {{ form_label(form.login, 'Login', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.login, {'attr': {'class': 'form-control'}}) }}
+                            <div class="text-danger">  
+                                {{ form_errors(form.login) }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form_label(form.password, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+                            <div class="text-danger">  
+                                {{ form_errors(form.password) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" id="resetFormButton" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    </div>
+
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Get the reset button and the form
+    const resetFormButton = document.getElementById("resetFormButton");
+    const form = document.querySelector("#clientModal form"); // Select the form inside the modal
+
+    // Add click event listener to the reset button
+    resetFormButton.addEventListener("click", () => {
+        if (form) {
+            // Reset all form fields
+            form.reset();
+
+            // Clear validation error messages
+            const errorMessages = form.querySelectorAll(".text-danger");
+            errorMessages.forEach((error) => {
+                error.textContent = ""; // Clear error messages
+            });
+
+            // Remove validation error classes from form fields
+            const errorFields = form.querySelectorAll(".is-invalid");
+            errorFields.forEach((field) => {
+                field.classList.remove("is-invalid");
+            });
+        }
+    });
+});
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const createAccountSwitch = document.querySelector('input[type="checkbox"][name="client[createAccount]"]');
+        const userFields = document.getElementById("user-fields");
+        const clearButton = document.getElementById('clear-form-button');
+        const clientForm = document.querySelector('#clientModal form');
+
+        // Initial state check for user fields visibility
+        if (createAccountSwitch) {
+            userFields.style.display = createAccountSwitch.checked ? "block" : "none";
+
+            // Toggle visibility dynamically
+            createAccountSwitch.addEventListener("change", () => {
+                userFields.style.display = createAccountSwitch.checked ? "block" : "none";
+            });
+        }
+
+        // Clear the form when the "Annuler" button is clicked
+        if (clearButton && clientForm) {
+            clearButton.addEventListener('click', () => {
+                clientForm.reset(); // Reset all form fields
+                
+                // Ensure userFields visibility resets properly
+                if (createAccountSwitch) {
+                    userFields.style.display = createAccountSwitch.checked ? "block" : "none";
+                } else {
+                    userFields.style.display = "none";
+                }
+            });
+        }
+
+        // Automatically open the modal if there are errors
+        {% if showModal is defined and showModal %}
+        const clientModal = new bootstrap.Modal(document.getElementById('clientModal'));
+        clientModal.show();
+        {% endif %}
+    });
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const resetFormButton = document.getElementById("resetFormButton");
+    const form = document.querySelector("form"); // Adjust the selector if your form has a specific ID or class
+
+    resetFormButton.addEventListener("click", () => {
+        if (form) {
+            form.reset(); // Clears all form fields
+        }
+    });
+});
+</script>
+</body>
+{% endblock %}

@@ -1,0 +1,536 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserController!{% endblock %}
+
+{% block body %}
+<style>
+    
+
+    .admin-screen {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+ {# justify-content: space-between; #}
+.filters {
+    display: flex;
+    align-items: center;
+   justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.filters .btn {
+    padding: 5px 15px;
+    margin-right: 10px;
+}
+
+
+
+.btn-sm {
+    padding: 5px 10px;
+    margin-right: 5px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination .btn {
+    margin: 0 5px;
+    padding: 5px 10px;
+}
+.card-header{
+    background-color: #34495e;
+    color:white;
+    margin-bottom:30px;
+}
+.btn-primary{
+    background-color: #1abc9c;
+    border:1px solid #1abc9c ;
+    font-weight:bold;
+}
+.btn-primary:hover {
+        background-color: #34495e;
+    }
+    .btn-active {
+    background-color: red;
+    color: white;
+}
+.filters a {
+    margin: 0; /* Évite des marges automatiques entre les liens */
+    text-decoration: none; /* Supprime les soulignements */
+}
+
+.filters {
+    display: flex; /* Affiche les éléments dans une ligne sans espaces supplémentaires */
+    gap: 10px; /* Ajoute un espace contrôlé entre les boutons */
+}
+
+.btn {
+    padding: 10px 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+}
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+    background-color: #1abc9c;
+    color: white;
+}
+.modal-footer .btn-danger {
+    background-color: #e74c3c;
+    border: 1px solid #e74c3c;
+
+}
+.btn-danger {
+    background-color:red;
+    border: 1px solid #e74c3c;
+    font-weight:bold;
+
+}
+.modal-body img {
+    margin-bottom: 10px;
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    margin-right: 10px;
+}
+.modal-body .form-group label {
+    min-width: 100px; 
+    text-align: left; 
+    margin-right: 10px; 
+}
+.form-label {
+    text-align: left !important; 
+    display: block; 
+    margin-bottom: 5px; 
+    font-weight: 600; 
+    color: #3b3f5c; 
+}
+
+.form-control {
+    border-radius: 5px; 
+    box-shadow: none; 
+}
+
+</style>
+<div class="maincontent">
+    <div class="admin-screen">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Lister Clients</h3>
+            </div>
+            <div class="card-body">
+                <div class="filters">
+                    <div>
+                        <a href="{{ path('app_user') }}">
+                            <button class="btn {% if app.request.attributes.get('_route') == 'app_user' %}btn-active{% else %}btn-light{% endif %}">
+                                ALL
+                            </button>
+                        </a>
+                        <a href="{{ path('app_user_admins') }}">
+                            <button class="btn {% if app.request.attributes.get('_route') == 'app_user_admins' %}btn-active{% else %}btn-light{% endif %}">
+                                Admin
+                            </button>
+                        </a>
+                        <a href="{{ path('app_user_boutiquiers') }}">
+                            <button class="btn {% if app.request.attributes.get('_route') == 'app_user_boutiquiers' %}btn-active{% else %}btn-light{% endif %}">
+                                Boutiquier
+                            </button>
+                        </a>
+                        <a href="{{ path('app_user_clients') }}">
+                            <button class="btn {% if app.request.attributes.get('_route') == 'app_user_clients' %}btn-active{% else %}btn-light{% endif %}">
+                                Client
+                            </button>
+                        </a>
+                        <div class="btn-group">
+    <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        Filtrer par Statut
+    </button>
+    <ul class="dropdown-menu">
+        <li>
+            <a class="dropdown-item {% if app.request.query.get('status') == 'active' %}active{% endif %}" 
+               href="{{ path(app.request.attributes.get('_route'), { status: 'active' }) }}">
+                Comptes Actifs
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item {% if app.request.query.get('status') == 'inactive' %}active{% endif %}" 
+               href="{{ path(app.request.attributes.get('_route'), { status: 'inactive' }) }}">
+                Comptes Inactifs
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item {% if app.request.query.get('status') is null %}active{% endif %}" 
+               href="{{ path(app.request.attributes.get('_route')) }}">
+                Tous les Comptes
+            </a>
+        </li>
+    </ul>
+</div>
+
+                    </div>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal">NOUVEAU</button>
+                </div>
+  
+                <table class="table table-bordered" >
+                    <thead class="table">
+                        <tr>
+                            <th>ROLE</th>
+                            <th>NOM COMPLET</th>
+                            <th>LOGIN</th>
+                            <th>ACTION</th>
+                             <th>STATUT</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for item in results %}
+                        <tr>
+                            {% if item.getType == 'client' %}
+                                <td>Client</td>
+                                <td>{{ item.user ? item.user.nom ~ ' ' ~ item.user.prenom : item.surname }}</td>
+                                <td>{{ item.user ? item.user.login : '-' }}</td>
+                                <td>
+                                    {% if item.user %}
+                                        <a href="{{ path('app_user', {id: item.id}) }}" type="button" class="btn btn-info" style="background-color: #1abc9c; border-color: #16a085;color: white;">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    {% else %}
+                                        <button 
+                                            class="btn btn-info btn-sm" 
+                                            style="background-color: #34495e; border-color: #34495e;color: white;"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#associateUserModal"
+                                            data-client-id="{{ item.id }}"
+                                            data-client-surname="{{ item.surname }}"
+                                            data-client-telephone="{{ item.telephone }}"
+                                            data-client-adresse="{{ item.adresse }}">
+                                            <i class="fa fa-user-plus"></i>
+                                        </button>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if item.user %}
+                                        {% if item.user.isActive %}
+                                            Actif
+                                            <a href="{{ path('app_user_toggle', {id: item.user.id}) }}" class="btn btn-danger btn-sm">
+                                                Désactiver
+                                            </a>
+                                        {% else %}
+                                            Inactif
+                                            <a href="{{ path('app_user_toggle', {id: item.user.id}) }}" class="btn btn-primary btn-sm">
+                                                Activer
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                            {% elseif item.getType == 'user' %}
+                                {% if 'ROLE_ADMIN' in item.roles %}
+                                    <td>Admin</td>
+                                    <td>{{ item.nom }} {{ item.prenom }}</td>
+                                    <td>{{ item.login }}</td>
+                                    <td>
+                                        <a href="{{path("app_user",{id:item.id})}}" type="button"class="btn btn-info" style="background-color: #1abc9c; border-color: #16a085;color: white;">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if item.isActive %}
+                                            Actif
+                                            <a href="{{ path('app_user_toggle', {id: item.id}) }}" class="btn btn-danger btn-sm">
+                                                Désactiver
+                                            </a>
+                                        {% else %}
+                                            Inactif
+                                            <a href="{{ path('app_user_toggle', {id: item.id}) }}" class="btn btn-success btn-sm">
+                                                Activer
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                {% elseif 'ROLE_BOUTIQIER' in item.roles and 'ROLE_ADMIN' not in item.roles %}
+                                    <td>Boutiquier</td>
+                                    <td>{{ item.nom }} {{ item.prenom }}</td>
+                                    <td>{{ item.login }}</td>
+                                    <td>        
+                                        <a href="{{path("app_user",{id:item.id})}}" type="button"class="btn btn-info" style="background-color: #1abc9c; border-color: #16a085;color: white;">
+                                            <i class="fa fa-edit"></i>
+                                        </a>            
+                                    </td>
+                                    <td>
+                                        {% if item.isActive %}
+                                            Actif
+                                            <a href="{{ path('app_user_toggle', {id: item.id}) }}" class="btn btn-danger btn-sm">
+                                                Désactiver
+                                            </a>
+                                        {% else %}
+                                            Inactif
+                                            <a href="{{ path('app_user_toggle', {id: item.id}) }}" class="btn btn-primary btn-sm">
+                                                Activer
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">Aucun élément trouvé</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <nav>
+    <ul class="pagination justify-content-center">
+        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+            <a class="page-link" 
+               href="?page={{ page - 1 }}{% if app.request.query.get('status') %}&status={{ app.request.query.get('status') }}{% endif %}" 
+               aria-label="Previous">
+                &laquo;
+            </a>
+        </li>
+        {% for i in 1..nbrePages %}
+        <li class="page-item {% if page == i %}active{% endif %}">
+            <a class="page-link" 
+               href="?page={{ i }}{% if app.request.query.get('status') %}&status={{ app.request.query.get('status') }}{% endif %}">
+                {{ i }}
+            </a>
+        </li>
+        {% endfor %}
+        <li class="page-item {% if page == nbrePages %}disabled{% endif %}">
+            <a class="page-link" 
+               href="?page={{ page + 1 }}{% if app.request.query.get('status') %}&status={{ app.request.query.get('status') }}{% endif %}" 
+               aria-label="Next">
+                &raquo;
+            </a>
+        </li>
+    </ul>
+</nav>
+
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Créer un Utilisateur</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(form, { 'attr': { 'id': 'userForm' } }) }}
+                        <div class="mb-3">
+                            {{ form_label(form.login, 'Login', { 'label_attr': { 'class': 'form-label' } }) }}
+                            {{ form_widget(form.login, { 'attr': { 'class': 'form-control', 'placeholder': 'Enter login' } }) }}
+                            <div class="text-danger">{{ form_errors(form.login) }}</div>
+                        </div>
+                    
+                        <div class="mb-3">
+                            {{ form_label(form.roles, 'Roles', { 'label_attr': { 'class': 'form-label d-block mb-2' } }) }}
+                            <div class="d-flex flex-wrap gap-3">
+                                {% for choice in form.roles %}
+                                    <div class="form-check">
+                                        {{ form_widget(choice, { 'attr': { 'class': 'form-check-input' } }) }}
+                                        {{ form_label(choice, null, { 'label_attr': { 'class': 'form-check-label' } }) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="text-danger">{{ form_errors(form.roles) }}</div>
+                        </div>
+                    
+                        <div class="mb-3">
+                            {{ form_label(form.password, 'Password', { 'label_attr': { 'class': 'form-label' } }) }}
+                            {{ form_widget(form.password, { 'attr': { 'class': 'form-control', 'placeholder': 'Enter password' } }) }}
+                            <div class="text-danger">{{ form_errors(form.password) }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.nom, 'Nom', { 'label_attr': { 'class': 'form-label' } }) }}
+                            {{ form_widget(form.nom, { 'attr': { 'class': 'form-control', 'placeholder': 'Enter last name' } }) }}
+                            <div class="text-danger">{{ form_errors(form.nom) }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.prenom, 'Prénom', { 'label_attr': { 'class': 'form-label' } }) }}
+                            {{ form_widget(form.prenom, { 'attr': { 'class': 'form-control', 'placeholder': 'Enter first name' } }) }}
+                            <div class="text-danger">{{ form_errors(form.prenom) }}</div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" id="resetFormButton" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" name="submitButton" value="user_form" class="btn btn-primary">ENREGISTRER</button>
+                        </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="associateUserModal" tabindex="-1" aria-labelledby="associateUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="associateUserModalLabel"><strong>COMPTE</strong></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="me-3">
+                            <img src="https://www.identite.photos/wp-content/uploads/2018/01/photo-identit%C3%A9-pr%C3%A9fectures-480x480.jpg" 
+                                alt="Profile" 
+                                >
+                        </div>
+                        
+                        <div class="text-start">
+                            <p><strong>Prénom:</strong> <span id="clientSurname"></span></p>
+                            <p><strong>Tel:</strong> <span id="clientTelephone"></span></p>
+                            <p><strong>Adresse:</strong> <span id="clientAdresse"></span></p>
+                            <p><strong>Id:</strong> <span id="clientIdField"></span></p>
+                        </div>
+                    </div>
+                    {{ form_start(formAssociate, { 'attr': { 'id': 'formAssociate' } }) }}
+                        {{ form_widget(formAssociate.clientId, { 'id': 'hiddenClientId' }) }}
+
+                        <div class="mb-3">
+                            {{ form_label(formAssociate.nom, 'Nom', { 'label_attr': { 'class': 'form-label' } }) }}
+                            {{ form_widget(formAssociate.nom, { 'attr': { 'class': 'form-control', 'placeholder': 'Enter last name' } }) }}
+                            <div class="text-danger">{{ form_errors(formAssociate.nom) }}</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(formAssociate.prenom, 'Prénom', { 'label_attr': { 'class': 'form-label' } }) }}
+                            {{ form_widget(formAssociate.prenom, { 'attr': { 'class': 'form-control', 'placeholder': 'Enter first name' } }) }}
+                            <div class="text-danger">{{ form_errors(formAssociate.prenom) }}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(formAssociate.login, 'Login', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(formAssociate.login, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le login'}}) }}
+                            <div class="text-danger">{{ form_errors(formAssociate.login) }}</div>
+
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(formAssociate.password, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(formAssociate.password, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le mot de passe'}}) }}
+                            <div class="text-danger">{{ form_errors(formAssociate.password) }}</div>
+
+                        </div>
+
+                        <div class="modal-footer ">
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ANNULER</button>
+                            <button type="submit" name="submitButton" value="associate_form" class="btn btn-primary">ENREGISTRER</button>
+                        </div>
+
+                    {{ form_end(formAssociate) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+{% if showModal %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var userModal = new bootstrap.Modal(document.getElementById('userModal'));
+        userModal.show();
+    });
+</script>
+{% endif %}
+{% if showAssociateModal %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var associateUserModal = new bootstrap.Modal(document.getElementById('associateUserModal'));
+        associateUserModal.show();
+    });
+</script>
+{% endif %}
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+    const associateUserModal = document.getElementById('associateUserModal');
+
+    associateUserModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+
+        // Vérifiez si le bouton contient l'attribut data-client-id
+        const clientId = button.getAttribute('data-client-id');
+        const clientSurname = button.getAttribute('data-client-surname');
+        const clientTelephone = button.getAttribute('data-client-telephone');
+        const clientAdresse = button.getAttribute('data-client-adresse');
+
+        console.log("ID récupéré depuis data-client-id :", clientId);
+
+        // Mettre à jour clientIdField
+        const clientIdField = document.getElementById('clientIdField');
+        if (clientIdField) {
+            clientIdField.textContent = clientId;
+            console.log("clientIdField mis à jour :", clientIdField.textContent);
+        } else {
+            console.error("clientIdField introuvable !");
+        }
+
+        // Ajouter les nouvelles lignes ici
+        document.getElementById('clientSurname').textContent = clientSurname;
+        document.getElementById('clientTelephone').textContent = clientTelephone;
+        document.getElementById('clientAdresse').textContent = clientAdresse;
+
+        // Forcer la mise à jour du champ caché hiddenClientId
+        const hiddenClientId = document.getElementById('hiddenClientId');
+        if (hiddenClientId) {
+            hiddenClientId.value = clientId;
+            console.log("hiddenClientId mis à jour :", hiddenClientId.value);
+        } else {
+            console.error("Le champ hiddenClientId est introuvable !");
+        }
+    });
+
+    // Assurez-vous que la valeur est correcte avant la soumission du formulaire
+    const form = document.getElementById('formAssociate');
+    if (form) {
+        form.addEventListener('submit', function () {
+            const clientIdField = document.getElementById('clientIdField');
+            const hiddenClientId = document.getElementById('hiddenClientId');
+
+            if (clientIdField && hiddenClientId) {
+                hiddenClientId.value = clientIdField.textContent;
+                console.log("Valeur finale de hiddenClientId :", hiddenClientId.value);
+            } else {
+                console.error("Erreur lors de la soumission : un champ est introuvable !");
+            }
+        });
+    } else {
+        console.error("Le formulaire formAssociate est introuvable !");
+    }
+});
+
+
+</script>
+
+
+
+{% endblock %}

@@ -1,0 +1,492 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DetteController!{% endblock %}
+
+{% block body %}
+<style>
+  
+.user-info {
+    display: flex;
+    justify-content: space-between;
+    background-color: #34495e;
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.info-card, .debt-summary {
+    flex: 1;
+    margin-right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.info-card:last-child {
+    margin-right: 0;
+}
+
+.profile-picture img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.details p {
+    margin: 5px 0;
+}
+
+.debt-summary p {
+    font-size: 1.1em;
+    margin: 10px 0;
+}
+
+.filter-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+    margin-top:20px
+}
+
+.filter-buttons .btn {
+    margin-left: 10px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table thead {
+    background-color: #004aad;
+    color: white;
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: #f7f7f7;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #eef3f7;
+}
+
+.table tbody tr:hover {
+    background-color: #dfe6ed;
+}
+
+.table th, .table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.pagination .btn {
+    margin: 0 5px;
+    padding: 5px 10px;
+}
+
+.card-header{
+    background-color: #34495e;
+    color:white;
+}
+.btn-primary{
+    background-color: #1abc9c;
+    border: 1px solid #1abc9c;
+
+}
+.btn-primary:hover{
+    background-color: #16a085;
+    border: 1px solid #16a085;
+
+}
+.debt-summary strong {
+        color: #16a085; 
+        font-weight: bold; 
+        font-size:20px;
+    }
+.btn-danger{
+    background-color: red;
+    border: 1px solid red;
+}
+
+.btn-danger:hover {
+    background-color: darkred;
+    border: 1px solid darkred;
+}
+.btn-encours {
+    background-color: gray;
+    color: white;
+    border: 1px solid gray;
+}
+
+.btn-encours:hover {
+    background-color: darkgray;
+    border: 1px solid darkgray;
+}
+.btn-ALL {
+    background-color: #34495e;
+    color: white;
+    border: 1px solid #34495e;
+}
+.btn-ALL :hover {
+    background-color: darkgray;
+   
+    border: 1px solid darkgray;
+}
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+    background-color: #1abc9c;
+    color: white;
+}
+.modal-footer .btn-danger {
+    background-color: #e74c3c;
+    border: 1px solid #e74c3c;
+
+}
+
+
+</style>
+<div class="maincontent">
+<div class="user-debt-screen">
+    
+
+    
+<div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Liste des demandes</h3>
+            </div>
+            
+        <div class="filter-buttons">
+            <a href="{{ path('app_demande_enCours', {statut: 'ANNULE'}) }}" class="btn btn-danger">Annulés</a>
+            <a href="{{ path('app_demande_enCours', {statut: 'ENCOURS'}) }}" class="btn btn-encours">En Cours</a>            
+            <a href="{{ path('app_demande_enCours', {statut: 'ACCEPTE'}) }}" class="btn btn-primary"> Acceptés</a>
+            <a href="{{ path('app_demande') }}" class="btn btn-ALL"> ALL</a>
+        </div>
+        {# <div class="">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#demandeModal">
+                Nouvelle Demande
+            </button>
+        </div> #}
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>MONTANT</th>
+                    <th>CLIENT</th>
+                    <th>TELEPHONE</th>
+                    <th>STATUT</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for demande in demandes %}
+            
+                            <td scope="row">{{demande.dateAt|date('d-m-Y')}}</td>
+                            <td>{{ demande.montant }}</td>
+                            <td>{{ demande.client.User.nom }}{{ demande.client.User.prenom }}</td>
+                            <td>{{ demande.client.telephone }}</td>
+                            <td>{{ demande.statut.label()  }}</td>
+                            <td><a href="{{ path('app_detail_demande', {id: demande.id}) }}" class="btn btn-primary btn-sm">
+                                    Détails
+                                </a>
+                                
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune demande trouvé</td>
+                        </tr>
+                        {% endfor %}
+                
+            </tbody>
+        </table>
+        <nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                        {% for i in 1..nbrePages %}
+                        <li class="page-item {% if page == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if page == nbrePages %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+    </div>
+</div>
+</div>
+
+
+</div>
+
+
+
+
+
+
+<!-- Modal Code -->
+<div class="modal fade" id="demandeModal" tabindex="-1" aria-labelledby="demandeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="demandeModalLabel">Créer une Demande</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(demandeForm, { 'attr': { 'id': 'demandeForm', 'action': '?showModal=true' } }) }}
+
+                <div class="row">
+                    <!-- Liste des articles disponibles -->
+                    <div class="col-md-6">
+                        <div class="border p-3 rounded shadow-sm">
+                            <h6>Liste des articles disponibles</h6>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Selectionner</th>
+                                        <th>Article</th>
+                                        <th>Prix</th>
+                                        <th>Qte en stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="articles-disponibles">
+                                    {% for article in articles %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="select-article" data-id="{{ article.id }}" data-nom="{{ article.nomArticle }}" data-prix="{{ article.prix }}" data-stock="{{ article.qteStock }}">
+                                        </td>
+                                        <td>{{ article.nomArticle }}</td>
+                                        <td>{{ article.prix }} CFA</td>
+                                        <td>{{ article.qteStock }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item {% if page1 == 1 %}disabled{% endif %}">
+                                    <a class="page-link" href="?page1={{ page1 - 1 }}&showModal=true" aria-label="Previous">
+                                        &laquo;
+                                    </a>
+                                </li>
+                                {% for i in 1..nbrePages1 %}
+                                <li class="page-item {% if page1 == i %}active{% endif %}">
+                                    <a class="page-link" href="?page1={{ i }}&showModal=true">{{ i }}</a>
+                                </li>
+                                {% endfor %}
+                                <li class="page-item {% if page1 == nbrePages1 %}disabled{% endif %}">
+                                    <a class="page-link" href="?page1={{ page1 + 1 }}&showModal=true" aria-label="Next">
+                                        &raquo;
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Liste des articles sélectionnés -->
+                    <div class="col-md-6">
+                        <div class="border p-3 rounded shadow-sm">
+                            <h6>Liste de produits sélectionnés</h6>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Article</th>
+                                        <th>Prix</th>
+                                        <th>Quantité</th>
+                                        <th>Montant</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="articles-selectionnes">
+                                    <!-- Articles sélectionnés dynamiquement insérés ici -->
+                                </tbody>
+                            </table>
+                            <div class="text-end fw-bold">
+                                Total: <span id="montant-total">0</span> CFA
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations supplémentaires -->
+                <hr>
+
+                <div class="mb-3">
+                    {{ form_label(demandeForm.description, 'Description', { 'label_attr': { 'class': 'form-label' } }) }}
+                    {{ form_widget(demandeForm.description, { 'attr': { 'class': 'form-control' } }) }}
+                    <div class="text-danger">{{ form_errors(demandeForm.description) }}</div>
+                </div>
+                {# <div class="mb-3">
+                    {{ form_label(demandeForm.Client, 'Client', { 'label_attr': { 'class': 'form-label' } }) }}
+                    {{ form_widget(demandeForm.Client, { 'attr': { 'class': 'form-control' } }) }}
+                    <div class="text-danger">{{ form_errors(demandeForm.Client) }}</div>
+                </div> #}
+
+                <input type="hidden" id="selected-articles" name="selected_articles" value="">
+
+                <!-- Boutons -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Créer</button>
+                </div>
+
+                {{ form_end(demandeForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Get the reset button and the form
+    const resetFormButton = document.querySelector('.btn-danger[data-bs-dismiss="modal"]'); // Annuler button
+    const form = document.querySelector("#demandeForm"); // Use the specific ID of the form
+
+    // Add click event listener to the reset button
+    resetFormButton.addEventListener("click", () => {
+        if (form) {
+            // Reset all form fields
+            form.reset();
+
+            // Clear validation error messages
+            const errorMessages = form.querySelectorAll(".text-danger");
+            errorMessages.forEach((error) => {
+                error.textContent = ""; // Clear error messages
+            });
+
+            // Remove validation error classes from form fields
+            const errorFields = form.querySelectorAll(".is-invalid");
+            errorFields.forEach((field) => {
+                field.classList.remove("is-invalid");
+            });
+        }
+    });
+});
+</script>
+
+
+
+
+
+
+<script>
+    
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const availableArticles = document.querySelectorAll(".select-article");
+    const selectedArticlesTable = document.getElementById("articles-selectionnes");
+    const totalElement = document.getElementById("montant-total");
+    const hiddenField = document.getElementById("selected-articles");
+
+    let selectedArticles = [];
+
+    const updateTotal = () => {
+        // Calculer le montant total
+        let total = selectedArticles.reduce((sum, article) => sum + article.prix * article.quantite, 0);
+        totalElement.textContent = total.toLocaleString(); // Mettre à jour l'affichage du total
+        hiddenField.value = JSON.stringify(selectedArticles); // Mettre à jour le champ caché
+    };
+
+    const addSelectedArticle = (article) => {
+        const row = document.createElement("tr");
+        row.setAttribute("data-id", article.id);
+
+        row.innerHTML = `
+            <td>${article.nom}</td>
+            <td>${article.prix} CFA</td>
+            <td>
+                <input type="number" class="form-control form-control-sm article-quantity" value="${article.quantite}" min="1" max="${article.stock}">
+            </td>
+            <td>${(article.prix * article.quantite).toLocaleString()} CFA</td>
+            <td><button class="btn btn-danger btn-sm remove-article">Supprimer</button></td>
+        `;
+
+        // Gérer les changements de quantité
+        row.querySelector(".article-quantity").addEventListener("input", (e) => {
+            const quantity = parseInt(e.target.value, 10) || 1;
+            const max = parseInt(e.target.max, 10);
+
+            if (quantity > max) {
+                e.target.value = max;
+            }
+
+            const articleIndex = selectedArticles.findIndex((a) => a.id === article.id);
+            selectedArticles[articleIndex].quantite = parseInt(e.target.value, 10);
+
+            // Mettre à jour le montant pour cet article
+            row.querySelector("td:nth-child(4)").textContent = 
+                (selectedArticles[articleIndex].prix * selectedArticles[articleIndex].quantite).toLocaleString() + " CFA";
+
+            updateTotal();
+        });
+
+        // Gérer la suppression de l'article
+        row.querySelector(".remove-article").addEventListener("click", () => {
+            selectedArticles = selectedArticles.filter((a) => a.id !== article.id);
+            row.remove();
+            updateTotal();
+        });
+
+        // Ajouter la ligne à la table
+        selectedArticlesTable.appendChild(row);
+        selectedArticles.push(article);
+        updateTotal();
+    };
+
+    availableArticles.forEach((checkbox) => {
+        checkbox.addEventListener("change", (e) => {
+            const article = {
+                id: checkbox.dataset.id,
+                nom: checkbox.dataset.nom,
+                prix: parseFloat(checkbox.dataset.prix),
+                stock: parseInt(checkbox.dataset.stock, 10),
+                quantite: 1,
+            };
+
+            if (checkbox.checked) {
+                addSelectedArticle(article);
+            } else {
+                selectedArticles = selectedArticles.filter((a) => a.id !== article.id);
+                selectedArticlesTable.querySelector(`tr[data-id="${article.id}"]`).remove();
+                updateTotal();
+            }
+        });
+    });
+
+    // Initialisation : Met à jour le total au chargement de la page si nécessaire
+    updateTotal();
+});
+
+</script>
+
+
+{% endblock %}

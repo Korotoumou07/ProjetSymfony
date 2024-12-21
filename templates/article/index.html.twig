@@ -1,0 +1,573 @@
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Approvisionnement{% endblock %}
+
+{% block body %}
+<style>
+
+    .container {
+    display: flex;
+    justify-content: space-between;
+   /*   gap: 20px; Espacement entre les colonnes */
+    width: 100%; /* S'assurer que le conteneur utilise toute la largeur */
+    margin-right:0
+}
+.C1{
+     border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    margin:10px ;
+
+}
+.C2{
+   display: flex;
+    justify-content: space-between;
+    margin:10px 50px;
+
+}
+
+.box {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #fff;
+    width: 100%;
+    margin-left:20px;
+    margin-right:0;
+   
+
+}
+
+
+    .box h2 {
+        margin: 0 0 20px 0;
+        font-size: 1.5em;
+    }
+
+    {# .box table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+         margin-bottom:10px;
+    }
+
+    .box table th, .box table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+    }
+
+    .box table th {
+        background-color: #f9f9f9;
+    }
+
+    .box table input[type="number"] {
+        width: 50px;
+        text-align: center;
+    } #}
+
+    .actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+
+    .actions button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        font-size: 1em;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        background-color: #1abc9c;
+    }
+
+    .btn-save:hover {
+        background-color: #34495e;
+    }
+
+    .btn-delete {
+        background-color: #e74c3c;
+    }
+
+    .btn-delete:hover {
+        background-color: #c0392b;
+    }
+
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .filter-buttons button {
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-filter-rup {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .btn-filter-dis {
+        background-color: #1abc9c;
+        color: white;
+    }
+
+    .btn-filter-all {
+        background-color: #7f8c8d;
+        color: white;
+    }
+   
+    .search-bar{
+        display: flex;
+    }
+    .card-header{
+    background-color: #34495e;
+    color:white;
+}
+.btn-primary {
+    background-color: #1abc9c;
+    border: 1px solid #1abc9c;
+    color: white;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #16a085; /* Couleur plus foncée */
+    border-color: #16a085; /* Correspond à la couleur de fond au survol */
+    color: white; /* Couleur du texte reste blanche */
+}
+
+    .quantity-decrease,
+    .quantity-increase {
+        background-color: #1abc9c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    /* Modifier la couleur au survol */
+    .quantity-decrease:hover,
+    .quantity-increase:hover {
+        background-color: #16a085; /* Teinte légèrement plus foncée */
+    }
+
+    
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+    background-color: #1abc9c;
+    color: white;
+}
+.modal-footer .btn-danger {
+    background-color: #e74c3c;
+    border: 1px solid #e74c3c;
+
+}
+</style>
+
+<div class="maincontent">
+
+    <div class="user-debt-screen">
+<div class="card">
+    <div class="card-header">
+        <h3 class="mb-0">Approvisionnement</h3>
+    </div>
+
+
+    <div>
+ <button class="btn btn-primary" style="margin-top: 20px; margin-bottom: 20px; float: right;" data-bs-toggle="modal" data-bs-target="#addArticleModal">
+                    Nouvel Article
+                </button>    </div>
+
+
+
+<div class="container">
+    <div class="box">
+    
+        <h2><strong>  Liste des aricles</strong></h2>
+         <div class="filter-buttons">
+            <a href="{{ path('app_RUP_article') }}" ><button class="btn-filter-rup">RUP</button></a>
+            <a href="{{ path('app_DIS_article') }}" ><button class="btn-filter-dis">DIS</button></a>
+            <a href="{{ path('app_article') }}" ><button class="btn-filter-all">ALL</button></a>
+
+        </div>
+       
+
+     
+        <table class="table table-bordered">
+            <thead class="table">
+                <tr>
+                    <th></th>
+                    <th>Article</th>
+                    <th>Prix</th>
+                    <th>Qte en stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                 {% for article in articles %}
+                        <tr>
+                            <td><input type="checkbox" class="select-article" data-id="{{ article.id }}"></td>
+                            <td>{{ article.nomArticle  }}</td>
+                            <td>{{ article.prix }}</td>
+                            <td>{{ article.qteStock }}</td>
+                            
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucun article trouvé</td>
+                        </tr>
+                        {% endfor %}
+                
+            </tbody>
+        </table>
+       
+                <nav>
+                    <ul class="pagination justify-content-center ">
+                        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                        {% for i in 1..nbrePages %}
+                        <li class="page-item {% if page == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if page == nbrePages %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+
+
+    </div>
+
+    <div class="box">
+            <h2><strong>Modifier les articles sélectionnés</strong></h2>
+
+
+
+
+       <table class="table table-bordered">
+        <thead class="table">
+                <tr>
+                    <th>Article</th>
+                    <th>Prix</th>
+                    <th>Quantité</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+               
+            </tbody>
+        </table id="selected-articles">
+
+        <div class="actions">
+            <button class="btn-save">SAVE</button>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+
+
+
+
+<!-- Modal pour ajouter un nouvel article -->
+<div class="modal fade" id="addArticleModal" tabindex="-1" aria-labelledby="addArticleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addArticleModalLabel">Ajouter un nouvel article</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(createArticleForm, { 'action': path('app_article'), 'attr': { 'id': 'createArticleForm' } }) }}
+                
+                <div class="mb-3">
+                    {{ form_label(createArticleForm.nomArticle, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(createArticleForm.nomArticle, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">{{ form_errors(createArticleForm.nomArticle) }}</div>
+                </div>
+                <div class="mb-3">
+                    {{ form_label(createArticleForm.qteStock, 'Quantité en Stock', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(createArticleForm.qteStock, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">{{ form_errors(createArticleForm.qteStock) }}</div>
+                </div>
+                <div class="mb-3">
+                    {{ form_label(createArticleForm.prix, 'Prix', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(createArticleForm.prix, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">{{ form_errors(createArticleForm.prix) }}</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="resetFormButton" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+                {{ form_end(createArticleForm) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showModal = urlParams.get('showModal') === 'true';
+    const addArticleModal = new bootstrap.Modal(document.getElementById('addArticleModal'));
+
+    if (showModal) {
+        addArticleModal.show();
+    }
+
+    const form = document.getElementById('createArticleForm');
+    form.addEventListener('submit', (event) => {
+        const formAction = new URL(form.action, window.location.origin);
+        formAction.searchParams.set('showModal', 'true');
+        form.action = formAction.toString();
+    });
+});
+
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const resetFormButton = document.getElementById("resetFormButton");
+    const form = document.getElementById("createArticleForm"); // Use the specific ID of the form
+
+    resetFormButton.addEventListener("click", () => {
+        if (form) {
+            // Reset all form fields
+            form.reset();
+
+            // Clear validation error messages
+            const errorMessages = form.querySelectorAll(".text-danger");
+            errorMessages.forEach((error) => {
+                error.textContent = ""; // Clear error messages
+            });
+
+            // Remove validation error classes from form fields
+            const errorFields = form.querySelectorAll(".is-invalid");
+            errorFields.forEach((field) => {
+                field.classList.remove("is-invalid");
+            });
+        }
+    });
+});
+</script>
+
+
+
+
+
+{% block javascripts %}
+
+
+
+
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("addArticleForm");
+
+    // Gérer la soumission du formulaire
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        // Récupérer les données du formulaire
+        const formData = new FormData(form);
+        const articleData = {
+            name: formData.get("articleName"),
+            price: parseFloat(formData.get("articlePrice")),
+            stock: parseInt(formData.get("articleStock"), 10)
+        };
+
+        // Envoyer les données au serveur
+        fetch("/add-article", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(articleData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Erreur lors de l'ajout de l'article.");
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert("Article ajouté avec succès !");
+            location.reload(); // Recharger la page pour voir le nouvel article
+        })
+        .catch(error => {
+            console.error("Erreur :", error);
+            alert("Erreur lors de l'ajout de l'article. Veuillez réessayer.");
+        });
+    });
+
+    // Ouvrir le modal si `showModal` est défini
+    if (typeof showModal !== "undefined" && showModal) {
+        const modal = document.getElementById("modal");
+        if (modal) modal.style.display = "block";
+    }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const articlesTable = document.querySelector(".box:first-child tbody"); // Tableau des articles disponibles
+    const selectedArticlesTable = document.querySelector(".box:last-child tbody"); // Tableau des articles sélectionnés
+    const totalPriceElement = document.getElementById("total-price"); // Champ pour afficher le total
+    const saveButton = document.querySelector(".btn-save"); // Bouton SAVE
+
+    const storageKey = "selectedArticles"; // Clé pour localStorage
+    let selectedArticles = JSON.parse(localStorage.getItem(storageKey)) || [];
+
+    // Fonction pour sauvegarder dans localStorage
+    function saveToLocalStorage() {
+        localStorage.setItem(storageKey, JSON.stringify(selectedArticles));
+    }
+
+    // Fonction pour mettre à jour le tableau des articles sélectionnés
+    function renderSelectedArticles() {
+        selectedArticlesTable.innerHTML = ""; // Réinitialise le tableau des articles sélectionnés
+        let total = 0;
+
+        selectedArticles.forEach((article) => {
+            const tr = document.createElement("tr");
+            tr.dataset.id = article.id;
+
+            tr.innerHTML = `
+                <td>${article.name}</td>
+                <td>${article.price} CFA</td>
+                <td>
+                    <input type="number" class="article-quantity" value="${article.quantity}" style="width: 70px;">
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm remove-article">Supprimer</button>
+                </td>
+            `;
+
+            // Gérer la suppression d'un article
+            tr.querySelector(".remove-article").addEventListener("click", () => {
+                selectedArticles = selectedArticles.filter((a) => a.id !== article.id);
+                saveToLocalStorage();
+                renderSelectedArticles();
+            });
+
+            // Gérer la modification des quantités
+            tr.querySelector(".article-quantity").addEventListener("input", (e) => {
+                const newQuantity = parseInt(e.target.value) || 1;
+                article.quantity = newQuantity;
+                saveToLocalStorage();
+                renderSelectedArticles();
+            });
+
+            selectedArticlesTable.appendChild(tr);
+            total += article.price * article.quantity;
+        });
+
+        totalPriceElement.value = `${total.toLocaleString()} CFA`;
+    }
+
+    // Gérer l'ajout d'un article depuis les cases à cocher
+    articlesTable.querySelectorAll(".select-article").forEach((checkbox) => {
+        checkbox.addEventListener("change", (event) => {
+            const row = event.target.closest("tr");
+            const article = {
+                id: event.target.dataset.id,
+                name: row.querySelector("td:nth-child(2)").textContent,
+                price: parseFloat(row.querySelector("td:nth-child(3)").textContent),
+                quantity: 1,
+            };
+
+            if (event.target.checked) {
+                // Ajouter l'article sélectionné
+                selectedArticles.push(article);
+            } else {
+                // Supprimer l'article sélectionné
+                selectedArticles = selectedArticles.filter((a) => a.id !== article.id);
+            }
+
+            saveToLocalStorage();
+            renderSelectedArticles();
+        });
+    });
+
+    // Gérer la sauvegarde des articles et quantités
+    saveButton.addEventListener("click", () => {
+        if (selectedArticles.length === 0) {
+            alert("Veuillez sélectionner au moins un article.");
+            return;
+        }
+
+        // Préparer les données à envoyer
+        const data = selectedArticles.map((article) => ({
+            id: article.id,
+            quantity: article.quantity,
+        }));
+
+        // Envoyer les données au serveur
+        fetch("/article/update-quantities", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Erreur lors de la mise à jour des quantités.");
+                }
+                return response.json();
+            })
+            .then(() => {
+                localStorage.removeItem(storageKey); // Efface les données une fois sauvegardées
+                location.reload(); // Recharger la page pour refléter les changements
+            })
+            .catch((error) => {
+                console.error("Erreur :", error);
+                alert("Erreur lors de la mise à jour. Veuillez réessayer.");
+            });
+    });
+
+    // Charger les articles sélectionnés au chargement de la page
+    renderSelectedArticles();
+});
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+{% endblock %}
+
+
+
+{% endblock %}

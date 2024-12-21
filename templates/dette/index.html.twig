@@ -1,0 +1,553 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello DetteController!{% endblock %}
+
+{% block body %}
+<style>
+  
+.user-info {
+    display: flex;
+    justify-content: space-between;
+    background-color: #34495e;
+    color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.info-card, .debt-summary {
+    flex: 1;
+    margin-right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.info-card:last-child {
+    margin-right: 0;
+}
+
+.profile-picture img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.details p {
+    margin: 5px 0;
+}
+
+.debt-summary p {
+    font-size: 1.1em;
+    margin: 10px 0;
+}
+
+.filter-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.filter-buttons .btn {
+    margin-left: 10px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table thead {
+    background-color: #004aad;
+    color: white;
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: #f7f7f7;
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #eef3f7;
+}
+
+.table tbody tr:hover {
+    background-color: #dfe6ed;
+}
+
+.table th, .table td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.pagination .btn {
+    margin: 0 5px;
+    padding: 5px 10px;
+}
+
+.card-header{
+    background-color: #34495e;
+    color:white;
+}
+.btn-primary{
+    background-color: #1abc9c;
+    border: 1px solid #1abc9c;
+    color:white;
+
+}
+.btn-primary:hover{
+    background-color: #16a085;
+    border: 1px solid #16a085;
+
+}
+.debt-summary strong {
+        color: #16a085; 
+        font-weight: bold; 
+        font-size:20px;
+    }
+.btn-danger{
+    background-color: red;
+    border: 1px solid red;
+}
+.nouveau{
+    display: flex;
+    justify-content: end;
+    margin-top:10px;
+
+}
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+.modal-header {
+    background-color: #1abc9c;
+    color: white;
+}
+.modal-footer .btn-danger {
+    background-color: #e74c3c;
+    border: 1px solid #e74c3c;
+
+}
+.box {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #fff;
+    width: 100%;
+    margin-left:20px;
+    margin-right:0;
+   
+
+}
+
+</style>
+
+
+<div class="maincontent">
+<div class="user-debt-screen">
+    <div class="user-info">
+        
+        <div class="debt-summary">
+    <p><strong>Montant Total:</strong> {{ montantTotal}} FCFA</p>
+    <p><strong>Montant Versé:</strong> {{ montantVerserTotal}} FCFA</p>
+    <p><strong>Montant Restant:</strong> {{ montantRestantTotal}} FCFA</p>
+</div>
+
+    </div>
+
+    <!-- Debt List and Filters -->
+    <div class="debt-list">
+        <div class="filter-buttons">
+            <a href="{{ path('app_dette_non_soldes') }}" class="btn btn-danger">Non soldées</a>
+            <a href="{{ path('app_dette_soldes') }}" class="btn btn-primary"> Soldées</a>
+
+
+        </div>
+<div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Liste des dettes</h3>
+            </div>
+            <!-- Button to trigger modal -->
+            <div class="nouveau">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#detteModal">
+                    Nouvelle Dette
+                </button>
+             </div>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>DATE</th>
+                    <th>MONTANT</th>
+                    <th>VERSER</th>
+                    <th>RESTANT</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for dette in dettes %}
+                        <tr>
+                            <td scope="row">{{dette.dateAt|date('d-m-Y')}}</td>
+                            <td>{{ dette.montant }}</td>
+                            <td>{{ dette.montantVerser }}</td>
+                            <td>{{ dette.montantRestant }}</td>
+                            <td><a href="{{path("app_payment",{idDette:dette.id})}}" type="button"class="btn btn-primary">
+                                    Details
+                                </a>
+                                {% if dette.montantRestant == 0 and not dette.isArchived %}
+                                    <a href="{{ path('app_dette_archive', { id: dette.id }) }}" class="btn btn-danger">Archiver</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune dette trouvé</td>
+                        </tr>
+                        {% endfor %}
+                
+            </tbody>
+        </table>
+<nav>
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page - 1 }}" aria-label="Previous">
+                                &laquo;
+                            </a>
+                        </li>
+                        {% for i in 1..nbrePages %}
+                        <li class="page-item {% if page == i %}active{% endif %}">
+                            <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="page-item {% if page == nbrePages %}disabled{% endif %}">
+                            <a class="page-link" href="?page={{ page + 1 }}" aria-label="Next">
+                                &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+    </div>
+</div>
+</div>
+
+
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="detteModal" tabindex="-1" aria-labelledby="detteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detteModalLabel">Créer une nouvelle dette</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {{ form_start(form, {'attr': {'id': 'dette-form'}}) }}
+               
+               
+              
+               
+
+
+<div class="row">
+                
+                    <div class="col-md-6">
+                    <div class="border p-3 rounded shadow-sm">
+                        <h6>Liste des articles disponibles</h6>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Selectionner</th>
+                                    <th>Article</th>
+                                    <th>Prix</th>
+                                    <th>Qte en stock</th>
+                                </tr>
+                            </thead>
+                            <tbody id="articles-disponibles">
+                                {% for article in articles %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="select-article" data-id="{{ article.id }}" data-nom="{{ article.nomArticle }}" data-prix="{{ article.prix }}" data-stock="{{ article.qteStock }}">
+                                    </td>
+                                    <td>{{ article.nomArticle }}</td>
+                                    <td>{{ article.prix }} CFA</td>
+                                    <td>{{ article.qteStock }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                     <ul class="pagination justify-content-center">
+    <li class="page-item {% if page1 == 1 %}disabled{% endif %}">
+        <a class="page-link" href="?page1={{ page1 - 1 }}&showModal=true" aria-label="Previous">
+            &laquo;
+        </a>
+    </li>
+    {% for i in 1..nbrePages1 %}
+    <li class="page-item {% if page1 == i %}active{% endif %}">
+        <a class="page-link" href="?page1={{ i }}&showModal=true">{{ i }}</a>
+    </li>
+    {% endfor %}
+    <li class="page-item {% if page1 == nbrePages1 %}disabled{% endif %}">
+        <a class="page-link" href="?page1={{ page1 + 1 }}&showModal=true" aria-label="Next">
+            &raquo;
+        </a>
+    </li>
+</ul>
+
+                    </div>
+                  </div>  
+                
+                    <!-- Liste des articles sélectionnés -->
+                    <div class="col-md-6">
+                    <div class="border p-3 rounded shadow-sm">
+                        <h6>Liste de produits sélectionnés</h6>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Article</th>
+                                    <th>Prix</th>
+                                    <th>Quantité</th>
+                                    <th>Montant</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="articles-selectionnes">
+                                <!-- Articles sélectionnés dynamiquement insérés ici -->
+                            </tbody>
+                        </table>
+                        <div class="text-end fw-bold">
+                            Total: <span id="montant-total">0</span> CFA
+                        </div>
+                    </div>
+                </div>
+                </div>
+            
+
+
+                <!-- Montant de la dette et informations du client -->
+                <hr>
+                <div class="mb-3">
+                    {{ form_label(form.client, 'Client', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.client, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">{{ form_errors(form.client) }}</div>
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.montantVerser, 'Montant versé', {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(form.montantVerser, {'attr': {'class': 'form-control'}}) }}
+                    <div class="text-danger">{{ form_errors(form.montantVerser) }}</div>
+                </div>
+                 <input type="hidden" id="selected-articles" name="selected_articles" value="">
+                <!-- Boutons -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="resetFormButton" data-bs-dismiss="modal">Annuler</button>
+                    {{ form_end(form) }}
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const showModal = urlParams.get('showModal') === 'true';
+    const userModal = new bootstrap.Modal(document.getElementById('detteModal'));
+
+    if (showModal) {
+        userModal.show();
+    }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const resetFormButton = document.getElementById("resetFormButton");
+    const form = document.querySelector("form"); // Adjust the selector to target the specific form if needed
+
+    resetFormButton.addEventListener("click", () => {
+        if (form) {
+            // Reset all form fields
+            form.reset();
+
+            // Clear validation error messages
+            const errorMessages = form.querySelectorAll(".text-danger");
+            errorMessages.forEach((error) => {
+                error.textContent = ""; // Clear error messages
+            });
+
+            // Remove validation error classes from form fields
+            const errorFields = form.querySelectorAll(".is-invalid");
+            errorFields.forEach((field) => {
+                field.classList.remove("is-invalid");
+            });
+        }
+    });
+});
+</script>
+
+
+
+
+<script>
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const articlesSelectionnesContainer = document.getElementById('articles-selectionnes');
+    const selectedArticlesInput = document.getElementById('selected-articles');
+    const montantTotalElement = document.getElementById('montant-total');
+
+    let selectedArticles = JSON.parse(localStorage.getItem('selectedArticles')) || [];
+
+    // Fonction pour mettre à jour le tableau et le total
+    function renderSelectedArticles() {
+        articlesSelectionnesContainer.innerHTML = '';
+        let total = 0;
+
+        selectedArticles.forEach(article => {
+            const tr = document.createElement('tr');
+            tr.dataset.id = article.id;
+            tr.innerHTML = `
+                <td class="article-name">${article.nom}</td>
+                <td class="article-price">${article.prix} CFA</td>
+                <td>
+                    <input type="number" class="article-quantity" value="${article.quantite}" min="1" style="width: 70px;">
+                </td>
+                <td class="article-total">${article.prix * article.quantite} CFA</td>
+                <td>
+                    <button class="btn btn-danger btn-sm remove-article">Supprimer</button>
+                </td>
+            `;
+
+            // Gérer la suppression
+            tr.querySelector('.remove-article').addEventListener('click', function () {
+                selectedArticles = selectedArticles.filter(a => a.id !== article.id);
+                localStorage.setItem('selectedArticles', JSON.stringify(selectedArticles));
+                renderSelectedArticles();
+            });
+
+            // Gérer la modification des quantités
+            tr.querySelector('.article-quantity').addEventListener('input', function () {
+                const newQuantity = parseInt(this.value) || 1;
+                article.quantite = newQuantity;
+                tr.querySelector('.article-total').innerText = (article.prix * newQuantity) + ' CFA';
+                localStorage.setItem('selectedArticles', JSON.stringify(selectedArticles));
+                renderSelectedArticles();
+            });
+
+            articlesSelectionnesContainer.appendChild(tr);
+            total += article.prix * article.quantite;
+        });
+
+        montantTotalElement.innerText = total + ' CFA';
+        selectedArticlesInput.value = JSON.stringify(selectedArticles);
+    }
+
+    // Restaurer les articles sélectionnés au chargement de la page
+    renderSelectedArticles();
+
+    // Ajouter des articles au tableau
+    const articlesDisponibles = document.querySelectorAll('.select-article');
+    articlesDisponibles.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            const id = this.getAttribute('data-id');
+            const nom = this.getAttribute('data-nom');
+            const prix = parseFloat(this.getAttribute('data-prix'));
+            const quantite = 1;
+
+            if (this.checked) {
+                // Ajouter l'article
+                selectedArticles.push({ id, nom, prix, quantite });
+            } else {
+                // Retirer l'article
+                selectedArticles = selectedArticles.filter(a => a.id !== id);
+            }
+
+            // Sauvegarder les données dans le Local Storage
+            localStorage.setItem('selectedArticles', JSON.stringify(selectedArticles));
+            renderSelectedArticles();
+        });
+    });
+document.addEventListener('DOMContentLoaded', () => {
+    const paginationLinks = document.querySelectorAll('.pagination a');
+
+    paginationLinks.forEach(link => {
+        link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const url = link.getAttribute('href');
+
+            const response = await fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const html = await response.text();
+            document.querySelector('#modal-content').innerHTML = html;
+        });
+    });
+});
+
+
+    document.querySelector('#dette-form').addEventListener('submit', function (e) {
+    const articles = [];
+    articlesSelectionnesContainer.querySelectorAll('tr').forEach(row => {
+        const id = row.dataset.id;
+        const quantity = parseInt(row.querySelector('.article-quantity').value, 10);
+
+        if (id && quantity > 0) {
+            articles.push({ id, quantity });
+        }
+    });
+
+    if (articles.length === 0) {
+        e.preventDefault();
+        displayErrors(['Veuillez sélectionner au moins un article.']);
+        return;
+    }
+
+    // Mettez à jour le champ caché
+    selectedArticlesInput.value = JSON.stringify(articles);
+
+    // Effacez le Local Storage après soumission réussie
+    localStorage.removeItem('selectedArticles');
+});
+
+
+    // Ouvrir le modal si `showModal` est défini
+    {% if showModal is defined and showModal %}
+        const detteModal = new bootstrap.Modal(document.getElementById('detteModal'));
+        detteModal.show();
+    {% endif %}
+});
+
+
+
+
+
+
+
+
+</script>
+
+{% endblock %} 
